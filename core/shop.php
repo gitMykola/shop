@@ -7,8 +7,9 @@ Class Route
 		session_start();
 		
 		//include configuration array
-		require_once 'config/config.php';
-		
+        $configuration = array();
+		include_once 'config\config.php';
+		//var_dump($configuration['application']['default_lang']);
 		//look in request
 		$request = explode('/', $_SERVER['REQUEST_URI']);
 		
@@ -16,19 +17,20 @@ Class Route
 		$lang_key = self::InitLang($request,$configuration['application']['default_lang']);
 		
 		//set default configuration
-		$def_controller = $configuration['application']['default_controller'];
-		$def_action = $configuration['application']['default_action'];
+		//$def_controller = $configuration['application']['default_controller'];
+		//$def_action = $configuration['application']['default_action'];
+		//$def_user = $configuration['application']['default_user'];
 		
 		//echo $lang_key."<br>".strtolower($request[1])."<br>";
 		//var_dump($request);
 		if($lang_key == strtolower($request[1]))$request_shift = array_shift($request);
 		//var_dump($request);
-		
-		$run = self::InitController($request,$def_controller,$def_action);
+		//Is it correct to use $request after shifting via $requets_shift????? But it's work!
+		$run = self::InitController($request,$configuration['application']);
 		if($run !== false)
 		{
 			if(!self::RunController($run, $lang_key))die;
-		}else die;		
+		}else self::Redirect($configuration['application']['site_url'].'/'.$lang_key);
 	}
 	function RunController($run,$lang){
 		$controller = new $run['controller']($lang);
@@ -41,21 +43,20 @@ Class Route
 		}	
 		return false;
 	}
-	function InitController($request,$controller_name,$action_name){
-		$view_file = 'view.php';
-		$view_path = "views/".$view_file;
+	function InitController($request,$config){
+	    $view_path = $config['view_path'];
 		if(file_exists($view_path))include $view_path;else return false;
 		
-		$model_name = 'model_'.$controller_name;
+		$model_name = $config['model_prefix'].$config['default_controller'];
 		$model_file = $model_name.'.php';
-		$model_path = "models/".$model_file;
+		$model_path = $config['model_path'].$model_file;
 		if(file_exists($model_path))include $model_path;else return false;
 		
-		$controller = 'controller_'.((self::ValidateController($request[1]))?$request[1]:$controller_name);
-		$action = 'action_'.((self::ValidateAction($request[2]))?$request[2]:$action_name);
+		$controller = $config['controller_prefix'].((count($request) > 1 && self::ValidateController($request[1]))?$request[1]:$config['default_controller']);
+		$action = $config['action_prefix'].((count($request) > 2 && self::ValidateAction($request[2]))?$request[2]:$config['default_action']);
 		
 		$controller_file = $controller.'.php';
-		$controller_path = "controllers/".$controller_file;
+		$controller_path = $config['controller_path'].$controller_file;
 				
 		if(file_exists($controller_path))include $controller_path;else return false;
 		
