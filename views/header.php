@@ -16,3 +16,13 @@
 		<script src="<?php echo $placeholders['site_url'];?>assets/js/my.js"></script>
 </head>
 	<body>
+	
+	<?/*
+	'<li class="first">FIRST</li>';
+			 if($data["paginator"]["page_num"] > 2)echo '<li>...Prev</li>';
+			 echo '
+			 <li><a href="'.$_SERVER["REQUEST_URI"].'?page_num='.($data["paginator"]["page_num"] - 1).'">'.($data["paginator"]["page_num"] - 1).'</a></li>
+			 <li class="current"><a href="'.$_SERVER["REQUEST_URI"].'?page_num='.($data["paginator"]["page_num"]).'">'.($data["paginator"]["page_num"]).'</a></li>
+			 <li><a href="'.$_SERVER["REQUEST_URI"].'?page_num='.($data["paginator"]["page_num"] + 1).'">'.($data["paginator"]["page_num"] + 1).'</a></li>';
+			 if(($data["paginator"]["page_num"] + 2) < $data["paginator"]["last_page"])echo '<li>Next...</li>
+			 <li class="last">LAST</li>' */

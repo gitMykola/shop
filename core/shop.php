@@ -1,4 +1,6 @@
 <?php 
+require_once 'config\config.php';
+
 Class Route
 {
 	static function start(){
@@ -7,8 +9,8 @@ Class Route
 		session_start();
 		
 		//include configuration array
-        $configuration = array();
-		include_once 'config\config.php';
+        $configuration = Config::set();//array();
+		//include_once 'config\config.php';
 		//var_dump($configuration['application']['default_lang']);
 		//look in request
 		$request = explode('/', $_SERVER['REQUEST_URI']);
@@ -32,18 +34,18 @@ Class Route
 			if(!self::RunController($run, $lang_key))die;
 		}else self::Redirect($configuration['application']['site_url'].'/'.$lang_key);
 	}
-	function RunController($run,$lang){
+	static function RunController($run,$lang){
 		$controller = new $run['controller']($lang);
 		$action = $run['action'];
 		
 		if(method_exists($controller, $action))
 		{
 			$controller->$action();
-			return true;
+			//return true;
 		}	
 		return false;
 	}
-	function InitController($request,$config){
+	static function InitController($request,$config){
 	    $view_path = $config['view_path'];
 		if(file_exists($view_path))include $view_path;else return false;
 		
@@ -62,16 +64,16 @@ Class Route
 		
 		return array('controller' => $controller,'action' => $action);
 	}
-	function ValidateController($controller){
+	static function ValidateController($controller){
 		//make additional validate by existing controllers
 		if(strlen($controller) > 2 && strlen($controller) < 20)return true;
 		return false;
 	}
-	function ValidateAction($action){
+	static function ValidateAction($action){
 		if (strlen($action) > 0 && strlen($action) < 20)return true;
 		return false;
 	}
-	function InitLang($request,$default_lang){
+	static function InitLang($request,$default_lang){
 		if(is_array($request) && strlen($request[1]) == 2) 
 			{
 				switch(strtolower($request[1]))
@@ -85,11 +87,11 @@ Class Route
 						}
 			}else return $default_lang;
 	}
-	function Redirect($url){
+	static function Redirect($url){
 		header("Location: http://".$url);
 		die;
 	}
-	function Error404(){
+	static function Error404(){
 		$host = 'http://'.$_SERVER['HTTP_HOST'].'/';
         header('HTTP/1.1 404 Not Found');
 		header("Status: 404 Not Found");
